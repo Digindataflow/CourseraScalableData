@@ -1,0 +1,42 @@
+import keras
+from sklearn.metrics import roc_auc_score
+import numpy as np
+ 
+class Histories(keras.callbacks.Callback):
+    def on_train_begin(self, logs={}):
+        self.aucs = []
+        self.losses = []
+ 
+    def on_train_end(self, logs={}):
+        return
+ 
+    def on_epoch_begin(self, epoch, logs={}):
+        return
+ 
+    def on_epoch_end(self, epoch, logs={}):
+        self.losses.append(logs.get('loss'))
+        y_pred = self.model.predict(self.validation_data[0:30])
+ 
+        yp = []
+        for i in xrange(0, len(y_pred)):
+            yp.append(y_pred[i][0])
+        yt = []
+        for x in self.validation_data[30]:
+            yt.append(x[0])
+         
+        auc = roc_auc_score(yt, yp)
+        self.aucs.append(auc)
+        print 'val-loss',logs.get('loss'), ' val-auc: ',auc,
+        print '\n'
+         
+        return
+ 
+    def on_batch_begin(self, batch, logs={}):
+        return
+ 
+    def on_batch_end(self, batch, logs={}):
+        return
+        
+histories = my_callbacks.Histories()
+model.fit(train_x, train_y, batch_size=128, epochs=5, shuffle=True, 
+class_weight={1:0.99282, 0:0.00718}, validation_split=0.1, callbacks=[histories])
